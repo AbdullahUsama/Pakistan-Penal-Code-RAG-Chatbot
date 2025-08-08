@@ -1,27 +1,3 @@
-# script to get the chapters:
-# CHAPTER I
-# CHAPTER II
-# CHAPTER III
-# CHAPTER IV
-# CHAPTER V
-# CHAPTER VI
-# CHAPTER VII
-# CHAPTER VIII
-# CHAPTER IX
-# CHAPTER X
-# CHAPTER XI
-# CHAPTER XII
-# CHAPTER XIII
-# CHAPTER XIV
-# CHAPTER XV
-# CHAPTER XVI
-# CHAPTER XVII
-# CHAPTER XVIII
-# CHAPTER XIX
-# CHAPTER XX
-# CHAPTER XXI
-# CHAPTER XXII
-# CHAPTER XXIII
 # def extract_specific_headings(file_path):
 #     """
 #     Extracts specific chapter headings and Roman numeral headings
