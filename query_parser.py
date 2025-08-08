@@ -1,6 +1,8 @@
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-# Hardcoded prompt
 user_query="""what if im found out guilty of hiring an hitman to kill a person, whats the penalty"""
 
 PROMPT = f"""You are a query optimization assistant for a Retrieval-Augmented Generation (RAG) system.
@@ -13,7 +15,7 @@ PROMPT = f"""You are a query optimization assistant for a Retrieval-Augmented Ge
 """
 
 # Configure and generate content in one go
-genai.configure(api_key="AIzaSyAdO0p8tO9pyC4gnqnsvC6n4vwcDS8dzjM") 
+genai.configure(api_key=os.getenv("GEMINI_API_KEY")) 
 model = genai.GenerativeModel('gemini-2.0-flash')
 response = model.generate_content(PROMPT)
 
