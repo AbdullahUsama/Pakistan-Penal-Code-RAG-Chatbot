@@ -160,17 +160,15 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
     Search the vector database and generate a response using Gemini API
     """
     try:
-        # Get the collection
         collection = client.collections.get(collection_name)
         
-        # Perform vector search
+        # vector search
         response = collection.query.near_text(
             query=query,
             limit=3,  # Get top 3 most relevant chunks
             return_metadata=["score"]
         )
         
-        # Extract relevant content
         relevant_chunks = []
         for obj in response.objects:
             relevant_chunks.append({
