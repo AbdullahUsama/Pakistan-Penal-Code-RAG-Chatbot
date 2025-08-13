@@ -173,7 +173,7 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
 
         print("DEBUG: Getting Rag optimzed query")
         rag_optimized_query = query_parser(query)
-        print("DEBUG: Retreived Rag optimzed query")
+        print("DEBUG: RAG Optimized Query: ", rag_optimized_query)
 
         print("DEBUG: Getting Chapters from the DB")
         response = collection.query.hybrid(
@@ -204,7 +204,7 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         # Create prompt for Gemini
 
         print("DEBUG: Getting reranked chunks")
-        reranked_context = semantic_reranker(query, max_chunks=3, chunk_size=800, overlap=150)
+        reranked_context = semantic_reranker(query, max_chunks=2, chunk_size=900, overlap=200)
         print("DEBUG:"+ context)
 
         prompt = f"""Based on the following sections from the Pakistan Penal Code, please provide a comprehensive answer to the user's question.
@@ -240,7 +240,9 @@ def query_parser(query:str):
     database containing sections of the Pakistan Penal Code. The optimized query should remove
     unnecessary conversational elements and focus on the core legal concepts, keywords,
     and section numbers relevant to the user's intent. When a query relates to a specific
-    topic, include the relevant chapter numbers from the list below to narrow the search.
+    topic, include the relevant chapter numbers from the list below to narrow the search. Make sure 
+    you add the complete chapter name like "CHAPTER V: OF ABETMENT" in the optimized prompt.
+
 
     **Pakistan Penal Code Chapters:**
     - CHAPTER I: INTRODUCTION
