@@ -178,7 +178,7 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         print("DEBUG: Getting Chapters from the DB")
         response = collection.query.hybrid(
             query=rag_optimized_query,
-            alpha=0.5,
+            alpha=0.9,
             limit=2,
             return_metadata=["score"]
         )
@@ -204,21 +204,26 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         # Create prompt for Gemini
 
         print("DEBUG: Getting reranked chunks")
-        reranked_context = semantic_reranker(query, relevant_chunks, max_chunks=1, chunk_size=500, overlap=100)
+        reranked_context = semantic_reranker(query, relevant_chunks, max_chunks=2, chunk_size=700, overlap=200)
         print("DEBUG:CONTEXT:"+ context)
         print("DEBUG:RERANKED_CONTEXT" + str(reranked_context))
 
-        prompt = f"""Based on the following sections from the Pakistan Penal Code, please provide a comprehensive answer to the user's question.
+        prompt = f"""You are a legal expert specializing in the Pakistan Penal Code. Your task is to analyze the provided sections and answer the user's legal question.
 
-        User Question: {query}
+        **User Question:**
+        {query}
 
-        Relevant Sections from Pakistan Penal Code:
+        **Relevant Legal Text:**
         {reranked_context}
 
-        Please provide a detailed answer based on the provided legal text. **At the end of your answer, cite the specific sections and their respective chapter numbers from the source text that support your response.** If the question cannot be fully answered from the given context, please mention that additional sections might be relevant.
+        **Instructions:**
+        1.  Formulate a detailed, clear, and comprehensive answer to the user's question using ONLY the provided legal text.
+        2.  If the question cannot be fully addressed with the given information, state that the provided text is insufficient and that other sections of the Pakistan Penal Code may be relevant. Do NOT speculate or provide information from outside the given context.
+        3.  Do not use conversational phrases like "Based on the provided context..." or "According to the sections you gave me...".
+        4.  At the end of your response, list the specific sections and their corresponding chapter numbers from the **Relevant Legal Text** that support your answer. Use the format: `(Chapter [Number], Section [Number])`.
 
-        Example of a citation:
-        Based on the provided context, the punishment is X. (Source: Chapter XVI, Section 302).
+        **Example:**
+        The punishment for murder is death or life imprisonment. (Chapter XVI, Section 302)
         """
 
         # Generate response using Gemini
