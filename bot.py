@@ -178,7 +178,7 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         print("DEBUG: Getting Chapters from the DB")
         response = collection.query.hybrid(
             query=rag_optimized_query,
-            alpha=0.9,
+            alpha=0.6,
             limit=2,
             return_metadata=["score"]
         )
@@ -274,6 +274,10 @@ def query_parser(query:str):
     - CHAPTER XXI: OF DEFAMATION
     - CHAPTER XXII: OF CRIMINAL INTIMIDATION, INSULT AND ANNOYANCE
     - CHAPTER XXIII: OF ATTEMPTS TO COMMIT OFFENCES
+
+    If the Query has a specific section number mentioned, then keep the query very short and add dot (.)
+    and hashtags (##) or (###) to that section number because in the vector db they are stored as 1., 3. 
+    etc and dont add the word "section" before it. e.g. ### 302., ### 455.
 
     **Original Query:**
     {user_query}
