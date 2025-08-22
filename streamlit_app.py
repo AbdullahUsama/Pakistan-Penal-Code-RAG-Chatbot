@@ -33,12 +33,24 @@ st.markdown("""
 <style>
     .main-header {
         text-align: center;
-        padding: 2rem 0;
+        padding: 2rem 1rem;
         background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
         color: white;
         border-radius: 10px;
         margin-bottom: 2rem;
     }
+    
+    .main-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .main-header p {
+        font-size: 1.2rem;
+        margin: 0;
+        opacity: 0.9;
+    }
+    
     .stButton > button {
         background-color: #2a5298;
         color: white;
@@ -49,6 +61,66 @@ st.markdown("""
     }
     .stButton > button:hover {
         background-color: #1e3c72;
+    }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+        .main-header {
+            padding: 1.5rem 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .main-header h1 {
+            font-size: 1.8rem;
+            line-height: 1.2;
+        }
+        
+        .main-header p {
+            font-size: 1rem;
+            padding: 0 0.5rem;
+        }
+        
+        /* Make chat input more mobile friendly */
+        .stChatInputContainer {
+            padding: 0 0.5rem;
+        }
+        
+        /* Adjust title spacing on mobile */
+        h1 {
+            font-size: 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+        
+        /* Better spacing for mobile */
+        .block-container {
+            padding-top: 1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .main-header {
+            padding: 1rem 0.25rem;
+        }
+        
+        .main-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .main-header p {
+            font-size: 0.9rem;
+        }
+        
+        h1 {
+            font-size: 1.3rem !important;
+        }
+        
+        /* Stack elements better on very small screens */
+        .block-container {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -272,7 +344,7 @@ def main():
             st.rerun()
     
     # Main chat interface
-    st.title("💬 Ask Your Legal Question")
+    st.markdown('<h1 style="text-align: center; margin-bottom: 1.5rem;">💬 Ask Your Legal Question</h1>', unsafe_allow_html=True)
     
     # Display chat messages
     for message in st.session_state.messages:
