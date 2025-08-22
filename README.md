@@ -1,5 +1,8 @@
 # Pakistan Penal Code RAG Chatbot ⚖️
 
+🔗 **Live Demo**: [https://pakistan-penal-code-rag-chatbot.streamlit.app/](https://pakistan-penal-code-rag-chatbot.streamlit.app/)
+
+
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-1.28.0%2B-red.svg)
