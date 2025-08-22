@@ -196,7 +196,7 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         
         # Semantic reranking
         with st.spinner("Analyzing relevant sections..."):
-            reranked_context = semantic_reranker(query, relevant_chunks, max_chunks=2, chunk_size=700, overlap=200)
+            reranked_context = semantic_reranker(query, relevant_chunks, max_chunks=4, chunk_size=700, overlap=200)
         
         # Create prompt for Gemini
         prompt = f"""You are a legal expert specializing in the Pakistan Penal Code. Your task is to analyze the provided sections and answer the user's legal question.
@@ -248,6 +248,10 @@ def main():
     if "client" not in st.session_state:
         st.session_state.client = None
     
+    # Initialize client in the background
+    if st.session_state.client is None:
+        st.session_state.client = initialize_weaviate_client()
+    
     # Sidebar
     with st.sidebar:
         st.title("📚 About")
@@ -259,41 +263,6 @@ def main():
         • Citing specific sections and chapters
         • Using advanced RAG technology
         """)
-        
-        st.title("🔧 System Status")
-        
-        # Connection status
-        if st.session_state.client is None:
-            with st.spinner("Connecting to database..."):
-                st.session_state.client = initialize_weaviate_client()
-        
-        if st.session_state.client:
-            st.success("✅ Connected to Weaviate")
-            
-            # Check collection
-            try:
-                if st.session_state.client.collections.exists(COLLECTION_NAME):
-                    st.success(f"✅ Collection '{COLLECTION_NAME}' ready")
-                else:
-                    st.error(f"❌ Collection '{COLLECTION_NAME}' not found")
-            except:
-                st.warning("⚠️ Unable to verify collection")
-        else:
-            st.error("❌ Database connection failed")
-        
-        st.title("💡 Example Questions")
-        # example_questions = [
-        #     "What is the punishment for murder?",
-        #     "What constitutes theft under PPC?",
-        #     "What are the offences against property?",
-        #     "What is abetment according to PPC?",
-        #     "What are the general exceptions in PPC?"
-        # ]
-        
-        for question in example_questions:
-            if st.button(question, key=f"example_{question[:20]}"):
-                st.session_state.messages.append({"role": "user", "content": question})
-                st.rerun()
         
         if st.button("🗑️ Clear Chat History"):
             st.session_state.messages = []
