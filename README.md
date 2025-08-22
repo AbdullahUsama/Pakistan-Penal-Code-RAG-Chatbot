@@ -32,9 +32,70 @@ Weaviate Vector Database
 ```
 
 ### RAG System Flow
+
 ```
-User Query → Query Processing → Vector Search → Context Retrieval → AI Response Generation
+User Query 
+    ↓
+Query Optimization (Gemini 2.0 Flash)
+    ├── Legal concept extraction
+    ├── Chapter mapping
+    └── Query enhancement
+    ↓
+Hybrid Search (Weaviate)
+    ├── Semantic Search (90% weight)
+    │   └── Cohere embed-multilingual-v3.0
+    └── Keyword Search (10% weight)
+    ↓
+Initial Retrieval
+    ├── Top 2 most relevant chunks
+    └── Metadata scoring
+    ↓
+Semantic Reranking
+    ├── Secondary chunking
+    ├── Sentence-BERT similarity scoring
+    └── Top 4 refined chunks selection
+    ↓
+Context Assembly & Prompt Engineering
+    ├── Legal text formatting
+    ├── Citation preparation
+    ↓
+AI Response Generation (Gemini 2.0 Flash)
+    ├── Legal analysis
+    ├── Section citations
+    └── Structured response
+    ↓
+Response Post-processing
+    ├── Source attribution
+    ├── Chapter references
+    └── Confidence indicators
 ```
+
+### Advanced RAG Components
+
+#### 🔄 Query Optimization Pipeline
+- **Legal Context Mapping**: Automatically maps queries to relevant PPC chapters
+- **Concept Enhancement**: Expands legal terminology for better retrieval
+- **Chapter-Specific Targeting**: Includes relevant chapter names in search
+
+#### 🔍 Hybrid Search Strategy
+```python
+# Search Configuration
+Alpha = 0.9  # 90% semantic, 10% keyword
+Limit = 2    # Initial retrieval count
+Model = "embed-multilingual-v3.0"  # Cohere embeddings
+```
+
+#### 🎯 Semantic Reranking
+- **Model**: `all-MiniLM-L12-v2` (Sentence-BERT)
+- **Chunking**: 700 words with 200-word overlap
+- **Selection**: Top 4 semantically similar chunks
+- **Scoring**: Cosine similarity-based ranking
+
+#### 🧠 Response Generation
+- **Model**: Gemini 2.0 Flash
+- **Approach**: Context-aware legal analysis
+- **Citations**: Automatic section and chapter referencing
+- **Validation**: Response grounded in retrieved context only
 
 ## 📁 Project Structure
 
@@ -50,13 +111,7 @@ ppc-rag/
 ├── bot.py                      # Core chatbot functionality
 ├── query_parser.py             # Query processing utilities
 ├── retreiver.py                # Document retrieval logic
-├── simple_chunker.py           # Basic chunking utilities
-└── audio/                      # Audio files directory
-    ├── 1.wav
-    ├── 2.wav
-    ├── 3.wav
-    ├── 4.wav
-    └── 5.wav
+└── simple_chunker.py           # Basic chunking utilities
 ```
 
 ## 🔧 Advanced Chunking Strategy
