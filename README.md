@@ -50,7 +50,7 @@ Hybrid Search (Weaviate)
     └── Keyword Search (10% weight)
     ↓
 Initial Retrieval
-    ├── Top 2 most relevant chunks
+    ├── Top 4 most relevant chunks
     └── Metadata scoring
     ↓
 Semantic Reranking
