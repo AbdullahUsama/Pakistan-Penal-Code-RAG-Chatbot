@@ -10,7 +10,7 @@
 
 A sophisticated **Retrieval-Augmented Generation (RAG)** chatbot designed to provide intelligent assistance for the Pakistan Penal Code. This system combines advanced document chunking, vector embeddings, and AI-powered question answering to deliver accurate legal information.
 
-## 🌟 Features
+## Features
 
 - **Intelligent Document Processing**: Hybrid chunking approach combining semantic and recursive strategies
 - **Vector Database**: Powered by Weaviate for efficient similarity search
@@ -19,7 +19,7 @@ A sophisticated **Retrieval-Augmented Generation (RAG)** chatbot designed to pro
 - **Interactive Web Interface**: Built with Streamlit for user-friendly interactions
 - **Real-time Search**: Fast and accurate retrieval of relevant legal sections
 
-## 🏗️ Architecture
+## Architecture
 
 ### Data Processing Pipeline
 ```
@@ -75,16 +75,16 @@ Response Post-processing
 
 ### Advanced RAG Components
 
-#### 🔄 Query Optimization Pipeline
+#### Query Optimization Pipeline
 - **Legal Context Mapping**: Automatically maps queries to relevant PPC chapters
 - **Concept Enhancement**: Expands legal terminology for better retrieval
 - **Chapter-Specific Targeting**: Includes relevant chapter names in search
 
-#### 🔍 Hybrid Search Strategy
+#### Hybrid Search Strategy
 ```python
 # Search Configuration
-Alpha = 0.9  # 90% semantic, 10% keyword
-Limit = 2    # Initial retrieval count
+Alpha = 0.6  # 60% semantic, 40% keyword
+Limit = 4    # Initial retrieval count
 Model = "embed-multilingual-v3.0"  # Cohere embeddings
 ```
 
@@ -111,7 +111,7 @@ ppc-rag/
 └── simple_chunker.py           # Basic chunking utilities
 ```
 
-## 🔧 Advanced Chunking Strategy
+## Advanced Chunking Strategy
 
 Our system employs a **hybrid chunking approach** that combines semantic understanding with optimal chunk sizing:
 
