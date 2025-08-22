@@ -360,7 +360,7 @@ def main():
                     st.info(f"📚 **Sources:** {', '.join(message['sources'])}")
     
     # Chat input
-    user_question = st.chat_input("Ask a question about the Pakistan Penal Code...")
+    user_question = st.chat_input("Ask a question about the PPC...")
     
     if user_question:
         # Add user message to chat history
