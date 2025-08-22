@@ -88,12 +88,6 @@ Limit = 2    # Initial retrieval count
 Model = "embed-multilingual-v3.0"  # Cohere embeddings
 ```
 
-#### 🎯 Semantic Reranking
-- **Model**: `all-MiniLM-L12-v2` (Sentence-BERT)
-- **Chunking**: 700 words with 200-word overlap
-- **Selection**: Top 4 semantically similar chunks
-- **Scoring**: Cosine similarity-based ranking
-
 #### 🧠 Response Generation
 - **Model**: Gemini 2.0 Flash
 - **Approach**: Context-aware legal analysis
@@ -258,14 +252,6 @@ Response: Aggregated information from relevant sections about conspiracy
 - **Language**: Python 3.8+
 - **Processing**: Custom hybrid chunking algorithm
 
-## 🔮 Future Enhancements
-
-- [ ] Multi-language support (Urdu translation)
-- [ ] Voice query integration
-- [ ] Advanced legal reasoning capabilities
-- [ ] Citation and case law integration
-- [ ] Mobile application development
-- [ ] API endpoint creation
 
 ## 🤝 Contributing
 
@@ -280,14 +266,6 @@ We welcome contributions! Please follow these steps:
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Pakistan's legal framework and the Pakistan Penal Code
-- Weaviate for vector database capabilities
-- Cohere for multilingual embeddings
-- Google for Gemini AI integration
-- Streamlit for the web framework
 
 ## 📞 Contact
 
