@@ -275,9 +275,8 @@ def query_parser(query:str):
     - CHAPTER XXII: OF CRIMINAL INTIMIDATION, INSULT AND ANNOYANCE
     - CHAPTER XXIII: OF ATTEMPTS TO COMMIT OFFENCES
 
-    If the Query has a specific section number mentioned, then keep the query very short and add dot (.)
-    and hashtags (##) or (###) to that section number because in the vector db they are stored as 1., 3. 
-    etc and dont add the word "section" before it. e.g. ### 302., ### 455.
+    If the Query has a specific section number mentioned, then keep the query very short and format
+    it as ### Section 503. The three hashtags and a dot (.) at the end is a must.
 
     **Original Query:**
     {user_query}

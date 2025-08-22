@@ -259,7 +259,7 @@ def main():
     MARKDOWN_FILE_PATH = 'ppc.md'  # Update this path as needed
     COLLECTION_NAME = "PPC_2"
     CHUNK_SIZE = 300  # Words per chunk (adjust as needed)
-    OVERLAP = 30      # Word overlap between chunks
+    OVERLAP = 50   # Word overlap between chunks
     
     print("="*60)
     print("Pakistan Penal Code - Advanced Chunking and Upload")

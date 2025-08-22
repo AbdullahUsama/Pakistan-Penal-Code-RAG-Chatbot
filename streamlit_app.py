@@ -111,6 +111,9 @@ def query_parser(query: str):
     - CHAPTER XXII: OF CRIMINAL INTIMIDATION, INSULT AND ANNOYANCE
     - CHAPTER XXIII: OF ATTEMPTS TO COMMIT OFFENCES
 
+    If the Query has a specific section number mentioned, then keep the query very short and format
+    it as ### Section 503. The three hashtags and a dot (.) at the end is a must.
+
     **Original Query:**
     {user_query}
     """
@@ -178,8 +181,8 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         with st.spinner("Searching Pakistan Penal Code..."):
             response = collection.query.hybrid(
                 query=rag_optimized_query,
-                alpha=0.9,
-                limit=2,
+                alpha=0.6,
+                limit=4,
                 return_metadata=["score"]
             )
         
