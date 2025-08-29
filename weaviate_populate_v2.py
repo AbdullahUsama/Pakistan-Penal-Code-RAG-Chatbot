@@ -3,6 +3,7 @@ from weaviate.classes.init import Auth
 from weaviate.classes.config import Configure, Property, DataType
 import os
 import re
+import time
 from dotenv import load_dotenv
 from typing import List, Dict
 
@@ -222,35 +223,71 @@ def create_weaviate_collection(client, collection_name: str = "PPC-2"):
     print(f"Collection '{collection_name}' created successfully!")
     return collection
 
-def upload_chunks_to_weaviate(client, chunks: List[Dict], collection_name: str = "PPC-2", batch_size: int = 100):
-    """Upload chunks to Weaviate collection"""
+def upload_chunks_to_weaviate(client, chunks: List[Dict], collection_name: str = "PPC-2", batch_size: int = 50):
+    """Upload chunks to Weaviate collection with rate limiting"""
     
     collection = client.collections.get(collection_name)
     
     print(f"Uploading {len(chunks)} chunks to Weaviate...")
+    print(f"Using batch size: {batch_size} (reduced to avoid rate limits)")
     
-    # Upload in batches
+    # Upload in batches with delays
     for i in range(0, len(chunks), batch_size):
         batch = chunks[i:i + batch_size]
         
-        with collection.batch.dynamic() as batch_upload:
-            for chunk in batch:
-                batch_upload.add_object(
-                    properties={
-                        "chapter_title": chunk["chapter_title"],
-                        "section_number": chunk["section_number"],
-                        "chunk_id": chunk["chunk_id"],
-                        "content": chunk["content"],
-                        "word_count": chunk["word_count"],
-                        "chunk_type": chunk["chunk_type"]
-                    }
-                )
+        print(f"Processing batch {i//batch_size + 1}/{(len(chunks)-1)//batch_size + 1}...")
         
-        print(f"Uploaded batch {i//batch_size + 1} ({len(batch)} objects)")
+        try:
+            with collection.batch.dynamic() as batch_upload:
+                for chunk in batch:
+                    batch_upload.add_object(
+                        properties={
+                            "chapter_title": chunk["chapter_title"],
+                            "section_number": chunk["section_number"],
+                            "chunk_id": chunk["chunk_id"],
+                            "content": chunk["content"],
+                            "word_count": chunk["word_count"],
+                            "chunk_type": chunk["chunk_type"]
+                        }
+                    )
+            
+            print(f"✅ Uploaded batch {i//batch_size + 1} ({len(batch)} objects)")
+            
+            # Add delay to avoid rate limits (wait 15 seconds between batches)
+            if i + batch_size < len(chunks):  # Don't wait after the last batch
+                print("⏳ Waiting 15 seconds to avoid rate limits...")
+                time.sleep(7)
+                
+        except Exception as e:
+            print(f"❌ Error uploading batch {i//batch_size + 1}: {e}")
+            print("⏳ Waiting 30 seconds before retrying...")
+            time.sleep(30)
+            
+            # Retry the batch
+            try:
+                with collection.batch.dynamic() as batch_upload:
+                    for chunk in batch:
+                        batch_upload.add_object(
+                            properties={
+                                "chapter_title": chunk["chapter_title"],
+                                "section_number": chunk["section_number"],
+                                "chunk_id": chunk["chunk_id"],
+                                "content": chunk["content"],
+                                "word_count": chunk["word_count"],
+                                "chunk_type": chunk["chunk_type"]
+                            }
+                        )
+                print(f"✅ Retry successful for batch {i//batch_size + 1}")
+            except Exception as retry_error:
+                print(f"❌ Retry failed for batch {i//batch_size + 1}: {retry_error}")
+                continue
     
     # Verify upload
-    total_objects = collection.aggregate.over_all(total_count=True).total_count
-    print(f"Total objects in collection: {total_objects}")
+    try:
+        total_objects = collection.aggregate.over_all(total_count=True).total_count
+        print(f"Total objects in collection: {total_objects}")
+    except Exception as e:
+        print(f"Warning: Could not verify total count: {e}")
 
 def main():
     """Main function to process and upload PPC data"""
@@ -314,7 +351,7 @@ def main():
         create_weaviate_collection(client, COLLECTION_NAME)
         
         # Upload chunks
-        upload_chunks_to_weaviate(client, chunks, COLLECTION_NAME)
+        upload_chunks_to_weaviate(client, chunks, COLLECTION_NAME, batch_size=30)  # Reduced batch size
         
         print(f"\n✅ Successfully uploaded {len(chunks)} chunks to '{COLLECTION_NAME}'!")
         

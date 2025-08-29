@@ -146,6 +146,79 @@ def load_sentence_transformer():
     """Load and cache the sentence transformer model"""
     return SentenceTransformer('all-MiniLM-L12-v2')
 
+def query_classifier(query: str):
+    """Classify if the query is related to PPC/Law or is a general conversational query"""
+    
+    CLASSIFICATION_PROMPT = f"""You are a query classification assistant. Your task is to determine if a user query is related to the Pakistan Penal Code (PPC) or legal matters, or if it's a general conversational query.
+
+    **Classification Rules:**
+    1. If the query is about law, legal matters, Pakistan Penal Code, sections, chapters, crimes, punishments, legal definitions, or any legal concepts - classify as "LEGAL"
+    2. If the query is a general greeting, personal question, casual conversation, or unrelated to law - classify as "GENERAL"
+
+    **Examples:**
+    - "What is section 302?" → LEGAL
+    - "Tell me about murder in PPC" → LEGAL
+    - "What are the punishments for theft?" → LEGAL
+    - "How are you?" → GENERAL
+    - "Who are you?" → GENERAL
+    - "What's the weather?" → GENERAL
+    - "Hello" → GENERAL
+
+    **User Query:** {query}
+
+    **Instructions:** 
+    Respond with only one word: either "LEGAL" or "GENERAL"
+    """
+    
+    model = genai.GenerativeModel('gemini-2.0-flash')
+    response = model.generate_content(CLASSIFICATION_PROMPT)
+    return response.text.strip().upper()
+
+def handle_general_query(query: str):
+    """Handle general conversational queries"""
+    query_lower = query.lower().strip()
+    
+    # Common greetings and responses
+    if any(greeting in query_lower for greeting in ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening']):
+        return "Hello! I'm the Pakistan Penal Code AI Assistant. I'm here to help you with legal questions about the Pakistan Penal Code. How can I assist you today?"
+    
+    elif any(question in query_lower for question in ['how are you', 'how do you do', 'how\'s it going']):
+        return "I'm doing well, thank you! I'm ready to help you with any questions about the Pakistan Penal Code. What would you like to know?"
+    
+    elif any(question in query_lower for question in ['who are you', 'what are you', 'tell me about yourself']):
+        return """I'm an AI assistant specialized in the Pakistan Penal Code. I can help you:
+
+• Find information about specific sections and chapters
+• Explain legal definitions and concepts
+• Understand punishments and legal procedures
+• Navigate through all 23 chapters of the PPC
+
+Feel free to ask me any legal questions related to the Pakistan Penal Code!"""
+    
+    elif any(question in query_lower for question in ['what can you do', 'what do you do', 'help']):
+        return """I can help you with the Pakistan Penal Code by:
+
+📚 **Searching through all 23 chapters**
+⚖️ **Explaining legal sections and definitions**
+🔍 **Finding relevant laws for specific situations**
+📖 **Providing detailed legal analysis**
+✅ **Citing specific sections and chapters**
+
+Just ask me any question about Pakistani criminal law, and I'll provide you with accurate information from the PPC!"""
+    
+    elif 'thank' in query_lower:
+        return "You're welcome! Feel free to ask me anything about the Pakistan Penal Code anytime."
+    
+    elif any(word in query_lower for word in ['bye', 'goodbye', 'see you', 'farewell']):
+        return "Goodbye! Come back anytime you need help with the Pakistan Penal Code. Have a great day!"
+    
+    else:
+        return """I'm designed to help specifically with Pakistan Penal Code related questions. 
+
+For legal questions about the PPC, I can provide detailed analysis and cite relevant sections. 
+
+Is there anything about Pakistani criminal law or the Pakistan Penal Code you'd like to know?"""
+
 def query_parser(query: str):
     """Parse and optimize the user query for better RAG performance"""
     user_query = query
@@ -371,39 +444,60 @@ def main():
             st.error("Database connection not available. Please refresh the page.")
             return
         
-        # Generate response
+        # First, classify the query
         try:
-            result = search_and_generate_response(st.session_state.client, user_question)
+            with st.spinner("Analyzing your question..."):
+                query_type = query_classifier(user_question)
             
-            if isinstance(result, dict):
-                # Add assistant message to chat history
-                assistant_message = {
-                    "role": "assistant", 
-                    "content": result["answer"],
-                    "sources": result["sources"]
-                }
-                st.session_state.messages.append(assistant_message)
-                
-                # Show debug information in expander (moved here to avoid variable scope issues)
-                with st.expander("🔍 Debug Information"):
-                    st.write("**Optimized Query:**", result.get("optimized_query", "N/A"))
-                    st.write("**Retrieved Chunks:**")
-                    for i, chunk in enumerate(result.get("relevant_chunks", []), 1):
-                        st.write(f"**Chunk {i} ({chunk['chapter']})** - Score: {chunk['score']}")
-                        st.write(chunk['content'][:500] + "..." if len(chunk['content']) > 500 else chunk['content'])
-                        st.write("---")
-                
-            else:
-                # Error occurred
+            if query_type == "GENERAL":
+                # Handle general conversational queries
+                response = handle_general_query(user_question)
                 st.session_state.messages.append({
                     "role": "assistant", 
-                    "content": f"❌ {result}"
+                    "content": response
+                })
+            
+            elif query_type == "LEGAL":
+                # Generate response using RAG system
+                result = search_and_generate_response(st.session_state.client, user_question)
+                
+                if isinstance(result, dict):
+                    # Add assistant message to chat history
+                    assistant_message = {
+                        "role": "assistant", 
+                        "content": result["answer"],
+                        "sources": result["sources"]
+                    }
+                    st.session_state.messages.append(assistant_message)
+                    
+                    # Show debug information in expander (moved here to avoid variable scope issues)
+                    with st.expander("🔍 Debug Information"):
+                        st.write("**Query Type:** Legal (Using RAG)")
+                        st.write("**Optimized Query:**", result.get("optimized_query", "N/A"))
+                        st.write("**Retrieved Chunks:**")
+                        for i, chunk in enumerate(result.get("relevant_chunks", []), 1):
+                            st.write(f"**Chunk {i} ({chunk['chapter']})** - Score: {chunk['score']}")
+                            st.write(chunk['content'][:500] + "..." if len(chunk['content']) > 500 else chunk['content'])
+                            st.write("---")
+                    
+                else:
+                    # Error occurred
+                    st.session_state.messages.append({
+                        "role": "assistant", 
+                        "content": f"❌ {result}"
+                    })
+            
+            else:
+                # Fallback for unclear classification
+                st.session_state.messages.append({
+                    "role": "assistant", 
+                    "content": "I'm not sure how to handle that query. Could you please ask a question about the Pakistan Penal Code or try rephrasing your question?"
                 })
                 
         except Exception as e:
             st.session_state.messages.append({
                 "role": "assistant", 
-                "content": f"❌ An error occurred: {e}"
+                "content": f"❌ An error occurred while processing your question: {e}"
             })
         
         # Rerun to show the new messages

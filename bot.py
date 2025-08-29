@@ -204,9 +204,9 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         # Create prompt for Gemini
 
         print("DEBUG: Getting reranked chunks")
-        reranked_context = semantic_reranker(query, relevant_chunks, max_chunks=2, chunk_size=700, overlap=200)
+        # reranked_context = semantic_reranker(query, relevant_chunks, max_chunks=2, chunk_size=700, overlap=200)
         print("DEBUG:CONTEXT:"+ context)
-        print("DEBUG:RERANKED_CONTEXT" + str(reranked_context))
+        # print("DEBUG:RERANKED_CONTEXT" + str(reranked_context))
 
         prompt = f"""You are a legal expert specializing in the Pakistan Penal Code. Your task is to analyze the provided sections and answer the user's legal question.
 
@@ -214,7 +214,7 @@ def search_and_generate_response(client, query, collection_name=COLLECTION_NAME)
         {query}
 
         **Relevant Legal Text:**
-        {reranked_context}
+        {context}
 
         **Instructions:**
         1.  Formulate a detailed, clear, and comprehensive answer to the user's question using ONLY the provided legal text.
